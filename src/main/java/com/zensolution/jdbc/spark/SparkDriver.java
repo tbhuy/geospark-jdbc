@@ -18,7 +18,7 @@ public class SparkDriver implements Driver {
 
     private static final Logger LOGGER = Logger.getLogger("com.zensolution.jdbc.spark");
 
-    public final static String URL_PREFIX = "com.zensolution.jdbc.spark:";
+    public final static String URL_PREFIX = "jdbc:spark:";
 
     static {
         try {
@@ -44,13 +44,17 @@ public class SparkDriver implements Driver {
         // get filepath from url
         String urlProperties = url.substring(URL_PREFIX.length());
         int questionIndex = urlProperties.indexOf('?');
-        String path = questionIndex >= 0 ? urlProperties.substring(0, questionIndex) : urlProperties;
+        String master = questionIndex >= 0 ? urlProperties.substring(0, questionIndex) : urlProperties;
+        if (master.startsWith("//")) {
+            master = "spark:" + master;
+        }
         if (questionIndex >= 0) {
             Properties prop = parseUrlIno(urlProperties.substring(questionIndex+1));
             info.putAll(prop);
         }
-        LOGGER.log(Level.FINE, "SparkDriver:connect() - Path=" + path);
-        return new SparkConnection(path, info);
+        String path = info.getProperty("path");
+        LOGGER.log(Level.FINE, "SparkDriver:connect() - master=" + master);
+        return new SparkConnection(master, path, info);
     }
 
     private Properties parseUrlIno(String urlProperties) throws SQLException {

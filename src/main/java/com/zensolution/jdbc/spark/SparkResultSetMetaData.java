@@ -14,14 +14,14 @@ public class SparkResultSetMetaData extends AbstractJdbcResultSetMetaData {
     private List<StructField> structFields = new ArrayList<>();
 
     public SparkResultSetMetaData(StructType structType) {
-        for (int i=0; i<structType.fields().length; i++) {
+        for (int i = 0; i < structType.fields().length; i++) {
             this.structFields.add(structType.fields()[i]);
         }
     }
 
     public int indexOf(String column) throws SQLException {
-        for ( int i=0; i<structFields.size(); i++ ) {
-            if ( structFields.get(i).name().equalsIgnoreCase(column) ) {
+        for (int i = 0; i < structFields.size(); i++ ) {
+            if (structFields.get(i).name().equalsIgnoreCase(column)) {
                 return i+1;
             }
         }
@@ -117,7 +117,7 @@ public class SparkResultSetMetaData extends AbstractJdbcResultSetMetaData {
 
     @Override
     public String getColumnClassName(int column) throws SQLException {
-        return JdbcUtils.getCommonJDBCType(this.structFields.get(column-1).dataType()).get().databaseTypeDefinition();
+        return JdbcUtils.getCommonJDBCType(this.structFields.get(column - 1).dataType()).get().databaseTypeDefinition();
     }
 
     @Override

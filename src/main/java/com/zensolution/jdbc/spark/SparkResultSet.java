@@ -84,63 +84,63 @@ public class SparkResultSet extends AbstractJdbcResultSet {
     }
 
     private void checkNull(int columnIndex) {
-        wasNullFlag = current.isNullAt(columnIndex-1);
+        wasNullFlag = current.isNullAt(columnIndex - 1);
     }
 
     @Override
     public String getString(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getString(columnIndex-1);
+        return current.getString(columnIndex - 1);
     }
 
     @Override
     public boolean getBoolean(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getBoolean(columnIndex-1);
+        return current.getBoolean(columnIndex - 1);
     }
 
     @Override
     public byte getByte(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getByte(columnIndex-1);
+        return current.getByte(columnIndex - 1);
     }
 
     @Override
     public short getShort(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getShort(columnIndex-1);
+        return current.getShort(columnIndex - 1);
     }
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.isNullAt(columnIndex-1) ? 0 : current.getInt(columnIndex-1);
+        return current.isNullAt(columnIndex - 1) ? 0 : current.getInt(columnIndex - 1);
     }
 
     @Override
     public long getLong(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.isNullAt(columnIndex-1) ? 0 : current.getLong(columnIndex-1);
+        return current.isNullAt(columnIndex - 1) ? 0 : current.getLong(columnIndex - 1);
     }
 
     @Override
     public float getFloat(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.isNullAt(columnIndex-1) ? 0 : current.getFloat(columnIndex-1);
+        return current.isNullAt(columnIndex - 1) ? 0 : current.getFloat(columnIndex - 1);
     }
 
     @Override
     public double getDouble(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.isNullAt(columnIndex-1) ? 0 : current.getDouble(columnIndex-1);
+        return current.isNullAt(columnIndex - 1) ? 0 : current.getDouble(columnIndex - 1);
     }
 
     @Override
@@ -148,7 +148,7 @@ public class SparkResultSet extends AbstractJdbcResultSet {
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getDecimal(columnIndex-1).setScale(scale);
+        return current.getDecimal(columnIndex - 1).setScale(scale);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class SparkResultSet extends AbstractJdbcResultSet {
     public Date getDate(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getDate(columnIndex-1);
+        return current.getDate(columnIndex - 1);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class SparkResultSet extends AbstractJdbcResultSet {
     public Timestamp getTimestamp(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getTimestamp(columnIndex-1);
+        return current.getTimestamp(columnIndex - 1);
     }
 
     @Override
@@ -303,7 +303,8 @@ public class SparkResultSet extends AbstractJdbcResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return this.resultSetMetaData;
+        //return this.resultSetMetaData;
+        return null;
     }
 
     @Override

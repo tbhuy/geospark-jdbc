@@ -17,33 +17,33 @@ public class SparkConnectionTest {
 
     @Test
     public void testConnectionInfo() throws Exception {
-        Class.forName("com.zensolution.jdbc.spark.SparkDriver");
         SparkConnection conn = (SparkConnection)DriverManager
-                .getConnection("com.zensolution.jdbc.spark:/Users/foobar/temp/console");
+                .getConnection("jdbc:spark:local?path=/Users/foobar/temp/console");
         Assertions.assertEquals("/Users/foobar/temp/console", conn.getConnectionInfo().getPath());
-        Assertions.assertTrue(conn.getConnectionInfo().getProperties().isEmpty());
+        Assertions.assertEquals(1, conn.getConnectionInfo().getProperties().size());
+        Assertions.assertEquals("/Users/foobar/temp/console", conn.getConnectionInfo().getProperties().getProperty("path"));
         Assertions.assertEquals(SupportedFormat.PARQUET, conn.getConnectionInfo().getFormat());
 
         conn = (SparkConnection)DriverManager
-                .getConnection("com.zensolution.jdbc.spark:/Users/foobar/temp/console?format=csv&timezone=GMT");
+                .getConnection("jdbc:spark:local?path=/Users/foobar/temp/console&format=csv&timezone=GMT");
         Assertions.assertEquals("/Users/foobar/temp/console", conn.getConnectionInfo().getPath());
-        Assertions.assertEquals(2, conn.getConnectionInfo().getProperties().size());
+        Assertions.assertEquals(3, conn.getConnectionInfo().getProperties().size());
+        Assertions.assertEquals("/Users/foobar/temp/console", conn.getConnectionInfo().getProperties().getProperty("path"));
         Assertions.assertEquals("csv", conn.getConnectionInfo().getProperties().getProperty("format"));
         Assertions.assertEquals("GMT", conn.getConnectionInfo().getProperties().getProperty("timezone"));
         Assertions.assertEquals(SupportedFormat.CSV, conn.getConnectionInfo().getFormat());
 
 
         assertThrows(IllegalArgumentException.class, () -> {
-            DriverManager.getConnection("com.zensolution.jdbc.spark:/Users/foobar/temp/console?format=NA&timezone=GMT");
+            DriverManager.getConnection("jdbc:spark:local?path=/Users/foobar/temp/console&format=NA&timezone=GMT");
         });
     }
 
     @Test
     public void testConnection() throws Exception {
-        Class.forName("com.zensolution.jdbc.spark.SparkDriver");
         File root = new File(this.getClass().getClassLoader().getResource("samples/userdata1").toURI());
 
-        Connection conn = DriverManager.getConnection("com.zensolution.jdbc.spark:"+root.getParentFile().getAbsolutePath());
+        Connection conn = DriverManager.getConnection("jdbc:spark:local?path="+root.getParentFile().getAbsolutePath());
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery("select * from userdata1");
         Assertions.assertEquals(13, rs.getMetaData().getColumnCount());

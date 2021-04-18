@@ -36,7 +36,7 @@ public class SparkService {
     }
 
     private SparkSession buildSparkSession() throws SQLException {
-        final SparkSession.Builder builder = SparkSession.builder().master("local").appName("parquet-jdbc-driver")
+        final SparkSession.Builder builder = SparkSession.builder().master(connectionInfo.getMaster()).appName("spark-jdbc-driver")
                 .config("spark.sql.session.timeZone", "UTC");
         Map<String, String> options = getOptions(connectionInfo.getProperties(), "spark", true);
 
@@ -75,7 +75,7 @@ public class SparkService {
                         .startsWith(prefix.toLowerCase(Locale.getDefault())+"."))
                 .collect(
                         Collectors.toMap(
-                                e -> keepPrefix? e.getKey().toString() : e.getKey().toString().substring(prefix.length()+1),
+                                e -> keepPrefix ? e.getKey().toString() : e.getKey().toString().substring(prefix.length()+1),
                                 e -> e.getValue().toString()
                         )
                 );
