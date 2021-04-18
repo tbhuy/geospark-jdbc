@@ -3,13 +3,16 @@ package com.zensolution.jdbc.spark.internal;
 import java.io.File;
 
 public enum SupportedFormat {
-    PARQUET, CSV, DELTA;
+    PARQUET, CSV, JSON, ORC, AVRO, DELTA;
 
     public String getSparkPath(String path, String table) {
         switch (this) {
             case PARQUET:
             case CSV:
-                return new File(path, table).getAbsolutePath();
+            case JSON:
+            case ORC:
+            case AVRO:
+                return new File(path, table + "." + name().toLowerCase()).getAbsolutePath();
             case DELTA:
                 return path.endsWith("/") ? path + table : path + "/" + table;
             default:
