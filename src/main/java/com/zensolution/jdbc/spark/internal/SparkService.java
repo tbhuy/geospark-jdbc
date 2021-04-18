@@ -61,9 +61,10 @@ public class SparkService {
         Set<String> tables = getRelations(spark.sessionState().sqlParser().parsePlan(sqlText));
         tables.forEach(table -> {
             SupportedFormat format = connectionInfo.getFormat();
+            String tablePath = format.getSparkPath(connectionInfo.getPath(), connectionInfo.isPartitionDiscovery(), table);
             Dataset<Row> ds = spark.read().format(format.name().toLowerCase(Locale.getDefault()))
                     .options(options)
-                    .load(format.getSparkPath(connectionInfo.getPath(), table));
+                    .load(format.getSparkPath(connectionInfo.getPath(), connectionInfo.isPartitionDiscovery(), table));
             ds.createOrReplaceTempView(table);
             metaData.put(new TableSchema(connectionInfo.getPath(), table), ds.schema());
         });

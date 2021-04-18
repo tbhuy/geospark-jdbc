@@ -8,11 +8,24 @@ public class ConnectionInfo {
     private String master;
     private String path;
     private SupportedFormat format;
+    private boolean partitionDiscovery;
     private Properties prop;
 
-    public ConnectionInfo(String master, String path, Properties info) {
+    public ConnectionInfo(String master, Properties info) {
+        // validate argument(s)
+        String path = info.getProperty("path");
+        if (path == null || path.length() == 0) {
+            throw new IllegalArgumentException("Unknown Path");
+        }
+
+        boolean partitionDiscovery = false;
+        if (info.getProperty("partitionDiscovery") != null) {
+            partitionDiscovery = Boolean.parseBoolean(info.getProperty("partitionDiscovery"));
+        }
+
         this.master = master;
         this.path = path;
+        this.partitionDiscovery = partitionDiscovery;
         this.prop = info;
         this.format = parseFormat(info.getProperty("format"));
     }
@@ -27,6 +40,10 @@ public class ConnectionInfo {
 
     public String getPath() {
         return path;
+    }
+
+    public boolean isPartitionDiscovery() {
+        return partitionDiscovery;
     }
 
     public Properties getProperties() {

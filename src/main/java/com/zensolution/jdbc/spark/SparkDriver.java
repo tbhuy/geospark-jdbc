@@ -52,9 +52,9 @@ public class SparkDriver implements Driver {
             Properties prop = parseUrlIno(urlProperties.substring(questionIndex+1));
             info.putAll(prop);
         }
-        String path = info.getProperty("path");
-        LOGGER.log(Level.FINE, "SparkDriver:connect() - master=" + master);
-        return new SparkConnection(master, path, info);
+
+        LOGGER.log(Level.INFO, "SparkDriver:connect() - master: " + master + ", info: " + info);
+        return new SparkConnection(master, info);
     }
 
     private Properties parseUrlIno(String urlProperties) throws SQLException {

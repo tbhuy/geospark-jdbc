@@ -39,15 +39,9 @@ public class SparkConnection extends AbstractJdbcConnection {
 
     /**
      * Creates a new CsvConnection that takes the supplied path
-     *
-     * @param path directory where the Parquet files are located
      */
-    protected SparkConnection(String master, String path, Properties info) throws SQLException {
-        // validate argument(s)
-        if (path == null || path.length() == 0) {
-            throw new IllegalArgumentException("Unknown Path");
-        }
-        this.connectionInfo = new ConnectionInfo(master, path, info);
+    protected SparkConnection(String master, Properties info) throws SQLException {
+        this.connectionInfo = new ConnectionInfo(master, info);
         this.info = info;
         this.sparkService = new SparkService(connectionInfo);
     }
