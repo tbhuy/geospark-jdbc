@@ -14,5 +14,5 @@ Spark JDBC driver is a read-only JDBC driver that uses Spark SQL as database tab
 
 The URL syntax for the driver URL is as follows
 
-    com.zensolution.jdbc.spark:<foldername>[?<property=value]",
-
+    jdbc:spark:local?path=<path>&format=<format>[&<property>=<value>]
+    jdbc:spark://localhost:7077?path=<path>&format=<format>[&<property>=<value>]
