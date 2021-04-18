@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-  compile ('org.apache.spark:spark-core_2.12:2.4.5') {
+  compile ('org.apache.spark:spark-core_2.12:3.1.1') {
     exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
     exclude group: 'com.fasterxml.jackson.module', module: 'jackson-module-scala_2.12'
   }
@@ -25,7 +25,7 @@ dependencies {
     exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
   }
   compile (
-          'org.apache.spark:spark-sql_2.12:2.4.5'
+          'org.apache.spark:spark-sql_2.12:3.1.1'
           , 'org.apache.hadoop:hadoop-aws:3.2.1'
           , 'io.delta:delta-core_2.12:0.6.1'
           , 'org.ini4j:ini4j:0.5.4'
