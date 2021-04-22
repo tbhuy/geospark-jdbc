@@ -24,13 +24,12 @@ public class Config
     }
 
     public Optional<Table> findTable(String table) {
-        return tables.stream().filter(t -> table.matches(t.getPattern())).findFirst();
+        return tables.stream().filter(t -> table.equals(t.getName())).findFirst();
     }
 
     public static Config load(String path) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         Config config = mapper.readValue(new File(path), Config.class);
-        System.out.println(config);
         return config;
     }
 

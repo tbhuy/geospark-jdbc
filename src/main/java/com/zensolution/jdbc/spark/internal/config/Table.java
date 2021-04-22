@@ -5,13 +5,13 @@ import java.util.Map;
 
 public class Table
 {
-    private String pattern;
+    private String name;
     private String path;
     private String format;
     private Map<String, String> options = new HashMap<>();
 
-    public String getPattern() {
-        return pattern;
+    public String getName() {
+        return name;
     }
 
     public String getPath() {
@@ -30,7 +30,7 @@ public class Table
     public String toString()
     {
         return "Table{" +
-                "pattern='" + pattern + '\'' +
+                "name='" + name + '\'' +
                 ", path='" + path + '\'' +
                 ", format='" + format + '\'' +
                 ", options=" + options +
