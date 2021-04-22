@@ -58,7 +58,7 @@ public class SparkDriver implements Driver {
         // Load configuration file
         String path = info.getProperty("config");
         if (path == null || path.isEmpty()) {
-            throw new SQLException("path must be specified");
+            throw new SQLException("config must be specified");
         }
         Config config;
         try {
