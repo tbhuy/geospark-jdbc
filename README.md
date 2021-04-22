@@ -5,14 +5,43 @@
 I haven't gotten chance to publish it into Maven Central. For now, please use the following command to build a fat Jar 
 
 ````
-gradlew clean shadowJar
+./gradlew clean shadowJar
 ````
 
 ## Documentation
 
-Spark JDBC driver is a read-only JDBC driver that uses Spark SQL as database tables. It is ideal for .
+Spark JDBC driver is a read-only JDBC driver that uses Spark SQL as database tables.
 
-The URL syntax for the driver URL is as follows
+First, need to create a configuration file like this:
 
-    jdbc:spark:local?path=<path>&format=<format>[&<property>=<value>]
-    jdbc:spark://localhost:7077?path=<path>&format=<format>[&<property>=<value>]
+```json
+{
+  "tables": [
+    {
+      "name": "people",
+      "path": "SPARK_HOME/examples/src/main/resources/people.csv",
+      "format": "csv",
+      "options": {
+        "header": "true",
+        "inferSchema": "true",
+        "delimiter": ";"
+      }
+    },
+    {
+      "name": "users",
+      "path": "SPARK_HOME/examples/src/main/resources/users.orc",
+      "format": "orc"
+    }
+  ]
+}
+```
+
+Then, you can get a JDBC connection with URL like below:
+
+```
+# Local mode
+jdbc:spark:local?config=<path_to_file>
+
+# Use a cluster
+jdbc:spark://localhost:7077?config=<path_to_file>
+```
