@@ -12,7 +12,7 @@ I haven't gotten chance to publish it into Maven Central. For now, please use th
 
 Spark JDBC driver is a read-only JDBC driver that uses Spark SQL as database tables.
 
-First, need to create a configuration file like this:
+First, create a configuration file like this:
 
 ```json
 {
