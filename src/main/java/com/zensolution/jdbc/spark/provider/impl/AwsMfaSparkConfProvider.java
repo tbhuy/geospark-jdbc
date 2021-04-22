@@ -37,8 +37,8 @@ public class AwsMfaSparkConfProvider implements SparkConfProvider {
     }
 
     private File getAwsCredentialPath(ConnectionInfo connectionInfo) throws SQLException {
-        String awsCredential = connectionInfo.getProperties().getProperty(AWS_CREDENTIAL_PATH);
-        if ( awsCredential==null || awsCredential.trim().isEmpty()) {
+        String awsCredential = connectionInfo.getConfig().getOptions().get(AWS_CREDENTIAL_PATH);
+        if ( awsCredential == null || awsCredential.trim().isEmpty()) {
             throw new SQLException(String.format("Please provide driver property '%s'", AWS_CREDENTIAL_PATH));
         }
         File awsCredentialFile = new File(awsCredential);
@@ -49,7 +49,7 @@ public class AwsMfaSparkConfProvider implements SparkConfProvider {
     }
 
     private String getAwsProfile(ConnectionInfo connectionInfo) throws SQLException {
-        String awsProfile = connectionInfo.getProperties().getProperty(AWS_PROFILE);
+        String awsProfile = connectionInfo.getConfig().getOptions().get(AWS_PROFILE);
         if ( awsProfile==null || awsProfile.trim().isEmpty()) {
             throw new SQLException(String.format("Please provide driver property '%s'", AWS_PROFILE));
         }

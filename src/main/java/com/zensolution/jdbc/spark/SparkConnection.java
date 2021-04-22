@@ -2,6 +2,7 @@ package com.zensolution.jdbc.spark;
 
 import com.zensolution.jdbc.spark.internal.ConnectionInfo;
 import com.zensolution.jdbc.spark.internal.SparkService;
+import com.zensolution.jdbc.spark.internal.config.Config;
 import com.zensolution.jdbc.spark.jdbc.AbstractJdbcConnection;
 
 import java.sql.DatabaseMetaData;
@@ -40,9 +41,8 @@ public class SparkConnection extends AbstractJdbcConnection {
     /**
      * Creates a new CsvConnection that takes the supplied path
      */
-    protected SparkConnection(String master, Properties info) throws SQLException {
-        this.connectionInfo = new ConnectionInfo(master, info);
-        this.info = info;
+    protected SparkConnection(String master, Config config) throws SQLException {
+        this.connectionInfo = new ConnectionInfo(master, config);
         this.sparkService = new SparkService(connectionInfo);
     }
 
@@ -108,7 +108,8 @@ public class SparkConnection extends AbstractJdbcConnection {
         return TRANSACTION_NONE;
     }
 
+    // TODO need to be fixed
     protected String getURL() {
-        return SparkDriver.URL_PREFIX + connectionInfo.getPath();
+        return SparkDriver.URL_PREFIX + "xxxx";
     }
 }

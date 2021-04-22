@@ -13,7 +13,7 @@ public interface SparkConfProvider {
     Map<String, String> getSparkConf(ConnectionInfo connectionInfo) throws SQLException;
 
     static Optional<SparkConfProvider> getSparkConfProvider(ConnectionInfo connectionInfo) throws SQLException {
-        String provider = connectionInfo.getProperties().getProperty(SPARK_CONF_PROVIDER);
+        String provider = connectionInfo.getConfig().getOptions().get(SPARK_CONF_PROVIDER);
         if ( provider == null ) {
             return Optional.empty();
         } else {

@@ -1,7 +1,9 @@
 package com.zensolution.jdbc.spark;
 
 import com.zensolution.jdbc.spark.internal.Versions;
+import com.zensolution.jdbc.spark.internal.config.Config;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Connection;
@@ -53,8 +55,20 @@ public class SparkDriver implements Driver {
             info.putAll(prop);
         }
 
-        LOGGER.log(Level.INFO, "SparkDriver:connect() - master: " + master + ", info: " + info);
-        return new SparkConnection(master, info);
+        // Load configuration file
+        String path = info.getProperty("config");
+        if (path == null || path.isEmpty()) {
+            throw new SQLException("path must be specified");
+        }
+        Config config;
+        try {
+            config = Config.load(path);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+
+        LOGGER.log(Level.INFO, "SparkDriver:connect() - master: " + master + ", config: " + config);
+        return new SparkConnection(master, config);
     }
 
     private Properties parseUrlIno(String urlProperties) throws SQLException {

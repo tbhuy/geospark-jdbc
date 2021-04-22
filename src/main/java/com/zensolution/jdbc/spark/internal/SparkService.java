@@ -1,5 +1,6 @@
 package com.zensolution.jdbc.spark.internal;
 
+import com.zensolution.jdbc.spark.internal.config.Table;
 import com.zensolution.jdbc.spark.provider.SparkConfProvider;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
@@ -38,7 +39,8 @@ public class SparkService {
     private SparkSession buildSparkSession() throws SQLException {
         final SparkSession.Builder builder = SparkSession.builder().master(connectionInfo.getMaster()).appName("spark-jdbc-driver")
                 .config("spark.sql.session.timeZone", "UTC");
-        Map<String, String> options = getOptions(connectionInfo.getProperties(), "spark", true);
+        // TODO for spark
+        Map<String, String> options = connectionInfo.getConfig().getOptions(); //getOptions(connectionInfo.getProperties(), "spark", true);
 
         Optional<SparkConfProvider> sparkConfProvider = SparkConfProvider.getSparkConfProvider(connectionInfo);
         if ( sparkConfProvider.isPresent() ) {
@@ -56,18 +58,23 @@ public class SparkService {
     }
 
     public void prepareTempView(String sqlText) throws SQLException, ParseException {
-        Map<String, String> options = getOptions(connectionInfo.getProperties(), connectionInfo.getFormat().name(), false);
+        //Map<String, String> options = getOptions(connectionInfo.getProperties(), connectionInfo.getFormat().name(), false);
 
         Set<String> tables = getRelations(spark.sessionState().sqlParser().parsePlan(sqlText));
-        tables.forEach(table -> {
-            SupportedFormat format = connectionInfo.getFormat();
-            String tablePath = format.getSparkPath(connectionInfo.getPath(), connectionInfo.isPartitionDiscovery(), table);
-            Dataset<Row> ds = spark.read().format(format.name().toLowerCase(Locale.getDefault()))
-                    .options(options)
-                    .load(format.getSparkPath(connectionInfo.getPath(), connectionInfo.isPartitionDiscovery(), table));
-            ds.createOrReplaceTempView(table);
-            metaData.put(new TableSchema(connectionInfo.getPath(), table), ds.schema());
-        });
+        for (String table: tables) {
+            Optional<Table> tableConfig = connectionInfo.getConfig().findTable(table);
+            if (tableConfig.isPresent()) {
+                //SupportedFormat format = tableConfig.get().getFormat();
+                String tablePath = tableConfig.get().getPath(); //format.getSparkPath(tableConfig.get().getPath(), connectionInfo.isPartitionDiscovery(), table);
+                Dataset<Row> ds = spark.read().format(tableConfig.get().getFormat())
+                        .options(tableConfig.get().getOptions())
+                        .load(tablePath);
+                ds.createOrReplaceTempView(table);
+                metaData.put(new TableSchema(tablePath, table), ds.schema());
+            } else {
+                throw new SQLException(String.format("table %s doesn't exist", table));
+            }
+        }
     }
 
     private Map<String, String> getOptions(Properties info, String prefix, boolean keepPrefix) {
@@ -96,9 +103,9 @@ public class SparkService {
     public Dataset<Row> getTables() {
         spark.catalog().listTables().select("name").show();
         List<Row> tables = metaData.entrySet().stream()
-                .filter(entry->entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
-                .map(entry->entry.getKey().getTable())
-                .map(table->RowFactory.create(table, "", "", ""))
+//                .filter(entry -> entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
+                .map(entry -> entry.getKey().getTable())
+                .map(table -> RowFactory.create(table, "", "", ""))
                 .collect(Collectors.toList());
 
         List<StructField> listOfStructField = new ArrayList<>();
@@ -113,8 +120,8 @@ public class SparkService {
 
     public Dataset<Row> getColumns(String table) throws SQLException {
         StructField[] fields = metaData.entrySet().stream()
-                .filter(entry->entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
-                .filter(entry->entry.getKey().getTable().equalsIgnoreCase(table))
+//                .filter(entry -> entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
+                .filter(entry -> entry.getKey().getTable().equalsIgnoreCase(table))
                 .map(Map.Entry::getValue)
                 .map(StructType::fields)
                 .findFirst()
