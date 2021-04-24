@@ -42,6 +42,9 @@ Then, you can get a JDBC connection with URL like below:
 # Local mode
 jdbc:spark:local?config=<path_to_file>
 
-# Use a cluster
+# Standalone cluster
 jdbc:spark://localhost:7077?config=<path_to_file>
+
+# Livy gateway
+jdbc:spark:livy://localhost:8080?config=<path_to_file>
 ```
