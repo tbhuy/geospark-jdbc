@@ -1,9 +1,9 @@
 package com.zensolution.jdbc.spark;
 
 import com.zensolution.jdbc.spark.internal.ConnectionInfo;
+import com.zensolution.jdbc.spark.internal.SparkResult;
 import com.zensolution.jdbc.spark.internal.SparkService;
 import com.zensolution.jdbc.spark.jdbc.AbstractJdbcResultSet;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.parser.ParseException;
 
@@ -46,15 +46,15 @@ public class SparkResultSet extends AbstractJdbcResultSet {
     private int count = 0;
 
     protected SparkResultSet(ConnectionInfo connectionInfo, String sqlText, SparkService sparkService) throws SQLException, ParseException {
-        Dataset<Row> ds = sparkService.executeQuery(sqlText);
+        SparkResult ds = sparkService.executeQuery(sqlText);
         resultSetMetaData = new SparkResultSetMetaData(ds.schema());
-        count = (int)ds.count();
+        count = (int) ds.count();
         this.dataListIterator = ds.toLocalIterator();
     }
 
-    protected SparkResultSet(Dataset<Row> ds) {
+    protected SparkResultSet(SparkResult ds) {
         resultSetMetaData = new SparkResultSetMetaData(ds.schema());
-        count = (int)ds.count();
+        count = (int) ds.count();
         this.dataListIterator = ds.toLocalIterator();
     }
 

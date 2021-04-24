@@ -18,10 +18,8 @@ import org.apache.spark.sql.types.StructType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -52,9 +50,10 @@ public class SparkService {
         return builder.getOrCreate().newSession();
     }
 
-    public Dataset<Row> executeQuery(String sqlText) throws SQLException, ParseException {
+    public SparkResult executeQuery(String sqlText) throws SQLException, ParseException {
         prepareTempView(sqlText);
-        return spark.sql(sqlText);
+        Dataset<Row> df = spark.sql(sqlText);
+        return new SparkResult(df.collectAsList(), df.schema());
     }
 
     public void prepareTempView(String sqlText) throws SQLException, ParseException {
@@ -77,17 +76,17 @@ public class SparkService {
         }
     }
 
-    private Map<String, String> getOptions(Properties info, String prefix, boolean keepPrefix) {
-        return info.entrySet().stream()
-                .filter(e->e.getKey().toString().toLowerCase(Locale.getDefault())
-                        .startsWith(prefix.toLowerCase(Locale.getDefault())+"."))
-                .collect(
-                        Collectors.toMap(
-                                e -> keepPrefix ? e.getKey().toString() : e.getKey().toString().substring(prefix.length()+1),
-                                e -> e.getValue().toString()
-                        )
-                );
-    }
+//    private Map<String, String> getOptions(Properties info, String prefix, boolean keepPrefix) {
+//        return info.entrySet().stream()
+//                .filter(e->e.getKey().toString().toLowerCase(Locale.getDefault())
+//                        .startsWith(prefix.toLowerCase(Locale.getDefault())+"."))
+//                .collect(
+//                        Collectors.toMap(
+//                                e -> keepPrefix ? e.getKey().toString() : e.getKey().toString().substring(prefix.length()+1),
+//                                e -> e.getValue().toString()
+//                        )
+//                );
+//    }
 
     private Set<String> getRelations(LogicalPlan plan) {
         return scala.collection.JavaConverters.seqAsJavaListConverter(plan.collectLeaves()).asJava()
@@ -100,7 +99,7 @@ public class SparkService {
                 }).collect(Collectors.toSet());
     }
 
-    public Dataset<Row> getTables() {
+    public SparkResult getTables() {
         spark.catalog().listTables().select("name").show();
         List<Row> tables = metaData.entrySet().stream()
 //                .filter(entry -> entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
@@ -115,10 +114,11 @@ public class SparkService {
         listOfStructField.add(DataTypes.createStructField("TABLE_CAT", DataTypes.StringType, true));
 
         StructType structType=DataTypes.createStructType(listOfStructField);
-        return spark.createDataFrame(tables, structType);
+        Dataset<Row> ds = spark.createDataFrame(tables, structType);
+        return new SparkResult(ds.collectAsList(), ds.schema());
     }
 
-    public Dataset<Row> getColumns(String table) throws SQLException {
+    public SparkResult getColumns(String table) throws SQLException {
         StructField[] fields = metaData.entrySet().stream()
 //                .filter(entry -> entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
                 .filter(entry -> entry.getKey().getTable().equalsIgnoreCase(table))
@@ -142,6 +142,7 @@ public class SparkService {
         listOfStructField.add(DataTypes.createStructField("TYPE_NAME", DataTypes.StringType, true));
 
         StructType structType=DataTypes.createStructType(listOfStructField);
-        return spark.createDataFrame(columns, structType);
+        Dataset<Row> ds = spark.createDataFrame(columns, structType);
+        return new SparkResult(ds.collectAsList(), ds.schema());
     }
 }
