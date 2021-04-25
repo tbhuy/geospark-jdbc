@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class SparkService {
+public class SparkService implements Service {
     private ConnectionInfo connectionInfo;
     private SparkSession spark;
     private static Map<TableSchema, StructType> metaData = new ConcurrentHashMap();
@@ -37,6 +37,7 @@ public class SparkService {
     private SparkSession buildSparkSession() throws SQLException {
         final SparkSession.Builder builder = SparkSession.builder().master(connectionInfo.getMaster()).appName("spark-jdbc-driver")
                 .config("spark.sql.session.timeZone", "UTC");
+
         // TODO for spark
         Map<String, String> options = connectionInfo.getConfig().getOptions(); //getOptions(connectionInfo.getProperties(), "spark", true);
 
@@ -56,7 +57,7 @@ public class SparkService {
         return new SparkResult(df.collectAsList(), df.schema());
     }
 
-    public void prepareTempView(String sqlText) throws SQLException, ParseException {
+    private void prepareTempView(String sqlText) throws SQLException, ParseException {
         //Map<String, String> options = getOptions(connectionInfo.getProperties(), connectionInfo.getFormat().name(), false);
 
         Set<String> tables = getRelations(spark.sessionState().sqlParser().parsePlan(sqlText));
@@ -99,7 +100,7 @@ public class SparkService {
                 }).collect(Collectors.toSet());
     }
 
-    public SparkResult getTables() {
+    public SparkResult getTables() throws SQLException {
         spark.catalog().listTables().select("name").show();
         List<Row> tables = metaData.entrySet().stream()
 //                .filter(entry -> entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
@@ -144,5 +145,11 @@ public class SparkService {
         StructType structType=DataTypes.createStructType(listOfStructField);
         Dataset<Row> ds = spark.createDataFrame(columns, structType);
         return new SparkResult(ds.collectAsList(), ds.schema());
+    }
+
+    @Override
+    public void close()
+    {
+        spark.close();
     }
 }

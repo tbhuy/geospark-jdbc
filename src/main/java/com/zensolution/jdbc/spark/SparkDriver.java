@@ -20,7 +20,8 @@ public class SparkDriver implements Driver {
 
     private static final Logger LOGGER = Logger.getLogger("com.zensolution.jdbc.spark");
 
-    public final static String URL_PREFIX = "jdbc:spark:";
+    public final static String SPARK_URL_PREFIX = "jdbc:spark:";
+    public final static String LIVY_URL_PREFIX = "jdbc:spark:livy:";
 
     static {
         try {
@@ -43,15 +44,25 @@ public class SparkDriver implements Driver {
             return null;
         }
 
-        // get filepath from url
-        String urlProperties = url.substring(URL_PREFIX.length());
+        boolean useLivy = false;
+        String prefix = SPARK_URL_PREFIX;
+        if (url.startsWith(LIVY_URL_PREFIX)) {
+            useLivy = true;
+            prefix = LIVY_URL_PREFIX;
+        }
+
+        // master URL (or Livy URL)
+        String urlProperties = url.substring(prefix.length());
         int questionIndex = urlProperties.indexOf('?');
+
         String master = questionIndex >= 0 ? urlProperties.substring(0, questionIndex) : urlProperties;
-        if (master.startsWith("//")) {
+        if (useLivy == false && master.startsWith("//")) {
             master = "spark:" + master;
         }
+
+        // query parameters
         if (questionIndex >= 0) {
-            Properties prop = parseUrlIno(urlProperties.substring(questionIndex+1));
+            Properties prop = parseUrlIno(urlProperties.substring(questionIndex + 1));
             info.putAll(prop);
         }
 
@@ -68,7 +79,7 @@ public class SparkDriver implements Driver {
         }
 
         LOGGER.log(Level.INFO, "SparkDriver:connect() - master: " + master + ", config: " + config);
-        return new SparkConnection(master, config);
+        return new SparkConnection(useLivy, master, config);
     }
 
     private Properties parseUrlIno(String urlProperties) throws SQLException {
@@ -94,7 +105,7 @@ public class SparkDriver implements Driver {
     @Override
     public boolean acceptsURL(String url) throws SQLException {
         LOGGER.log(Level.FINE, "SparkDriver:accept() - url=" + url);
-        return url.startsWith(URL_PREFIX);
+        return url.startsWith(SPARK_URL_PREFIX);
     }
 
     @Override

@@ -46,5 +46,5 @@ jdbc:spark:local?config=<path_to_file>
 jdbc:spark://localhost:7077?config=<path_to_file>
 
 # Livy gateway
-jdbc:spark:livy://localhost:8080?config=<path_to_file>
+jdbc:spark:livy:http//localhost:8080?config=<path_to_file>
 ```

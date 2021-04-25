@@ -1,6 +1,7 @@
 package com.zensolution.jdbc.spark;
 
 import com.zensolution.jdbc.spark.internal.ConnectionInfo;
+import com.zensolution.jdbc.spark.internal.Service;
 import com.zensolution.jdbc.spark.internal.SparkService;
 import com.zensolution.jdbc.spark.internal.config.Config;
 import com.zensolution.jdbc.spark.jdbc.AbstractJdbcConnection;
@@ -10,7 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 public class SparkConnection extends AbstractJdbcConnection {
     /**
@@ -18,10 +18,10 @@ public class SparkConnection extends AbstractJdbcConnection {
      */
     private ConnectionInfo connectionInfo;
 
-    /**
-     * Directory where the Parquet files to use are located
-     */
-    private Properties info;
+//    /**
+//     * Directory where the Parquet files to use are located
+//     */
+//    private Properties info;
 
     /**
      * Stores whether this Connection is closed or not
@@ -31,7 +31,7 @@ public class SparkConnection extends AbstractJdbcConnection {
     /*
      *  Unified interface to access spark
      */
-    private SparkService sparkService;
+    private Service sparkService;
 
     /**
      * Collection of all created Statements
@@ -41,8 +41,8 @@ public class SparkConnection extends AbstractJdbcConnection {
     /**
      * Creates a new CsvConnection that takes the supplied path
      */
-    protected SparkConnection(String master, Config config) throws SQLException {
-        this.connectionInfo = new ConnectionInfo(master, config);
+    protected SparkConnection(boolean useLivy, String master, Config config) throws SQLException {
+        this.connectionInfo = new ConnectionInfo(useLivy, master, config);
         this.sparkService = new SparkService(connectionInfo);
     }
 
@@ -67,6 +67,7 @@ public class SparkConnection extends AbstractJdbcConnection {
     @Override
     public void close() throws SQLException {
         if ( !this.closed ) {
+            sparkService.close();
             this.closed = true;
         }
     }
@@ -110,6 +111,6 @@ public class SparkConnection extends AbstractJdbcConnection {
 
     // TODO need to be fixed
     protected String getURL() {
-        return SparkDriver.URL_PREFIX + "xxxx";
+        return SparkDriver.SPARK_URL_PREFIX + "xxxx";
     }
 }

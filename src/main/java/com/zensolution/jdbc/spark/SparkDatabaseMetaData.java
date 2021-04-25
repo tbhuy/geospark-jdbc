@@ -1,6 +1,6 @@
 package com.zensolution.jdbc.spark;
 
-import com.zensolution.jdbc.spark.internal.SparkService;
+import com.zensolution.jdbc.spark.internal.Service;
 import com.zensolution.jdbc.spark.internal.Versions;
 import com.zensolution.jdbc.spark.jdbc.AbstractJdbcDatabaseMetaData;
 
@@ -9,10 +9,10 @@ import java.sql.SQLException;
 
 public class SparkDatabaseMetaData extends AbstractJdbcDatabaseMetaData {
 
-    private SparkService sparkService;
+    private Service sparkService;
     private SparkConnection connection;
 
-    public SparkDatabaseMetaData(SparkConnection connection, SparkService sparkService) {
+    public SparkDatabaseMetaData(SparkConnection connection, Service sparkService) {
         this.sparkService = sparkService;
         this.connection = connection;
     }

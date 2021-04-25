@@ -1,5 +1,6 @@
 package com.zensolution.jdbc.spark;
 
+import com.zensolution.jdbc.spark.internal.Service;
 import com.zensolution.jdbc.spark.internal.SparkService;
 import com.zensolution.jdbc.spark.jdbc.AbstractJdbcStatement;
 import org.apache.spark.sql.catalyst.parser.ParseException;
@@ -15,14 +16,14 @@ public class SparkStatement extends AbstractJdbcStatement {
     private static final Logger LOGGER = Logger.getLogger("com.nyiso.qa.emsbms.jdbc.spark.SparkDriver");
 
     private SparkConnection connection;
-    private SparkService sparkService;
+    private Service sparkService;
     private int fetchSize = 1;
     private int fetchDirection = ResultSet.FETCH_FORWARD;
     private int maxRows = 0;
     private boolean closed;
     private SparkResultSet resultSet;
 
-    protected SparkStatement(SparkConnection connection, SparkService sparkService) {
+    protected SparkStatement(SparkConnection connection, Service sparkService) {
         LOGGER.log(Level.FINE, "SparkDriver:connect() - connection=" + connection);
         this.connection = connection;
         this.sparkService = sparkService;
