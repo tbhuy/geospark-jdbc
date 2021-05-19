@@ -1,8 +1,8 @@
-# Spark JDBC driver
-
+# GeoSpark JDBC driver
+This repository is forked from [Spark-Jdbc](https://github.com/takezoe/spark-jdbc) developed by  Takezoe. [Apache Sedona](https://sedona.apache.org/) is integrated to support geospatial data processing and analysis. I intend to include this JDBC inside [Ontop](https://ontop-vkg.org/) to expose distributed geospatial datasets as RDF.   
 ## Build
 
-I haven't gotten chance to publish it into Maven Central. For now, please use the following command to build a fat Jar 
+Please use the following command to build a fat Jar 
 
 ````
 ./gradlew clean shadowJar
@@ -10,7 +10,8 @@ I haven't gotten chance to publish it into Maven Central. For now, please use th
 
 ## Documentation
 
-Spark JDBC driver is a read-only JDBC driver that uses Spark SQL as database tables.
+GeoSpark JDBC driver is a read-only JDBC driver that uses Spark SQL as database tables.
+
 
 First, create a configuration file like this:
 
@@ -18,8 +19,8 @@ First, create a configuration file like this:
 {
   "tables": [
     {
-      "name": "people",
-      "path": "SPARK_HOME/examples/src/main/resources/people.csv",
+      "name": "ais",
+      "path": "SPARK_HOME/examples/src/main/resources/ais.csv",
       "format": "csv",
       "options": {
         "header": "true",
@@ -28,9 +29,14 @@ First, create a configuration file like this:
       }
     },
     {
-      "name": "users",
-      "path": "SPARK_HOME/examples/src/main/resources/users.orc",
-      "format": "orc"
+      "name": "ship",
+      "path": "SPARK_HOME/examples/src/main/resources/ship.csv",
+      "format": "csv",
+      "options": {
+        "header": "true",
+        "inferSchema": "true",
+        "delimiter": ";"
+      }
     }
   ]
 }
@@ -45,3 +51,5 @@ jdbc:spark:local?config=<path_to_file>
 # Use a cluster
 jdbc:spark://localhost:7077?config=<path_to_file>
 ```
+
+Supported GeoSPARK functions can be found [here](https://sedona.apache.org/api/sql/Function/)

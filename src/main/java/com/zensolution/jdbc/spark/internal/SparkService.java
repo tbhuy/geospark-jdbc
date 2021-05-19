@@ -14,6 +14,7 @@ import org.apache.spark.sql.jdbc.JdbcType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.apache.sedona.sql.utils.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Geometry;
 
 public class SparkService {
     private ConnectionInfo connectionInfo;
@@ -37,8 +39,13 @@ public class SparkService {
     }
 
     private SparkSession buildSparkSession() throws SQLException {
-        final SparkSession.Builder builder = SparkSession.builder().master(connectionInfo.getMaster()).appName("spark-jdbc-driver")
-                .config("spark.sql.session.timeZone", "UTC");
+        final SparkSession.Builder builder = SparkSession.builder().master(connectionInfo.getMaster()).appName("spark-jdbc-driver").config("spark.serializer","org.apache.spark.serializer.KryoSerializer").
+        config("spark.kryo.registrator", "org.apache.sedona.core.serde.SedonaKryoRegistrator");
+    
+                
+                //.config("spark.driver.host", "192.168.16.4") 
+                //.config("spark.driver.bindAddress", "192.168.16.4");
+        //        .config("spark.driver.host","192.168.16.1");
         // TODO for spark
         Map<String, String> options = connectionInfo.getConfig().getOptions(); //getOptions(connectionInfo.getProperties(), "spark", true);
 
@@ -48,8 +55,10 @@ public class SparkService {
         }
         options.entrySet().stream()
                 .forEach(entry-> builder.config(entry.getKey(), entry.getValue()));
-
-        return builder.getOrCreate().newSession();
+        SparkSession sparkSession = builder.getOrCreate();
+        SedonaSQLRegistrator.registerAll(sparkSession);
+        sparkSession.sparkContext().setLogLevel("OFF");
+        return sparkSession;
     }
 
     public Dataset<Row> executeQuery(String sqlText) throws SQLException, ParseException {
@@ -131,7 +140,7 @@ public class SparkService {
         for (int i=0; i<fields.length; i++) {
             JdbcType jdbcType = JdbcUtils.getCommonJDBCType(fields[i].dataType()).get();
             columns.add(RowFactory.create("", "", table, fields[i].name(), jdbcType.jdbcNullType(),
-                    jdbcType.databaseTypeDefinition()));
+                    jdbcType.databaseTypeDefinition(), 1));
         }
         List<StructField> listOfStructField = new ArrayList<>();
         listOfStructField.add(DataTypes.createStructField("TABLE_CAT", DataTypes.StringType, true));
@@ -140,8 +149,42 @@ public class SparkService {
         listOfStructField.add(DataTypes.createStructField("COLUMN_NAME", DataTypes.StringType, true));
         listOfStructField.add(DataTypes.createStructField("DATA_TYPE", DataTypes.IntegerType, true));
         listOfStructField.add(DataTypes.createStructField("TYPE_NAME", DataTypes.StringType, true));
+        listOfStructField.add(DataTypes.createStructField("KEY_SEQ", DataTypes.IntegerType, true));
+       
+
 
         StructType structType=DataTypes.createStructType(listOfStructField);
         return spark.createDataFrame(columns, structType);
     }
+
+
+    public Dataset<Row> getPrimaryKeys(String table) throws SQLException {
+        StructField[] fields = metaData.entrySet().stream()
+//                .filter(entry -> entry.getKey().getPath().equalsIgnoreCase(connectionInfo.getPath()))
+                .filter(entry -> entry.getKey().getTable().equalsIgnoreCase(table))
+                .map(Map.Entry::getValue)
+                .map(StructType::fields)
+                .findFirst()
+                .orElseThrow(() -> new SQLException(table + " has not been loaded."));
+
+        List<Row> columns = new ArrayList<>();
+        
+            JdbcType jdbcType = JdbcUtils.getCommonJDBCType(fields[0].dataType()).get();
+            columns.add(RowFactory.create("", "", table, fields[0].name(), jdbcType.jdbcNullType(),
+                    jdbcType.databaseTypeDefinition()));
+        
+        List<StructField> listOfStructField = new ArrayList<>();
+        listOfStructField.add(DataTypes.createStructField("TABLE_CAT", DataTypes.StringType, true));
+        listOfStructField.add(DataTypes.createStructField("TABLE_SCHEM", DataTypes.StringType, true));
+        listOfStructField.add(DataTypes.createStructField("TABLE_NAME", DataTypes.StringType, true));
+        listOfStructField.add(DataTypes.createStructField("COLUMN_NAME", DataTypes.StringType, true));
+        listOfStructField.add(DataTypes.createStructField("DATA_TYPE", DataTypes.IntegerType, true));
+        listOfStructField.add(DataTypes.createStructField("TYPE_NAME", DataTypes.StringType, true));
+       
+
+
+        StructType structType=DataTypes.createStructType(listOfStructField);
+        return spark.createDataFrame(columns, structType);
+    }
+
 }

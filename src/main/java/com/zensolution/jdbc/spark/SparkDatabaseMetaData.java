@@ -53,6 +53,12 @@ public class SparkDatabaseMetaData extends AbstractJdbcDatabaseMetaData {
     }
 
     @Override
+    public ResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException {
+        return new SparkResultSet(sparkService.getPrimaryKeys(table));
+    }
+
+
+    @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
         return new SparkResultSet(sparkService.getTables());
     }

@@ -50,7 +50,7 @@ public abstract class AbstractJdbcConnection implements Connection {
 
     @Override
     public void rollback() throws SQLException {
-        throw new UnsupportedOperationException();
+       // throw new UnsupportedOperationException();
     }
 
 
@@ -81,7 +81,7 @@ public abstract class AbstractJdbcConnection implements Connection {
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
     }
 
     @Override

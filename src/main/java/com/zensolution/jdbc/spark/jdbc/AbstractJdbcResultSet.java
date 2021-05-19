@@ -30,7 +30,7 @@ public abstract class AbstractJdbcResultSet implements ResultSet {
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+      //  throw new UnsupportedOperationException();
     }
 
     @Override

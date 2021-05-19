@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class SparkConnection extends AbstractJdbcConnection {
+    
     /**
      * Directory where the Parquet files to use are located
      */
@@ -51,14 +52,24 @@ public class SparkConnection extends AbstractJdbcConnection {
         return connectionInfo;
     }
 
-    @Override
-    public Statement createStatement() throws SQLException {
-        checkOpen();
 
-        SparkStatement statement = new SparkStatement(this, sparkService);
+    @Override
+    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+        checkOpen();
+        SparkStatement statement = new SparkStatement(this, sparkService);     
         statements.add(statement);
         return statement;
     }
+
+
+    @Override
+    public Statement createStatement()  throws SQLException {
+        checkOpen();
+        SparkStatement statement = new SparkStatement(this, sparkService); 
+        statements.add(statement);   
+        return statement;
+    }
+
     @Override
     public boolean getAutoCommit() throws SQLException {
         return false;
