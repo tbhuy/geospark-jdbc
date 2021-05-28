@@ -32,7 +32,7 @@ public class SparkStatement extends AbstractJdbcStatement {
     public ResultSet executeQuery(String sql) throws SQLException {
         LOGGER.log(Level.INFO, "SparkStatement: executeQuery() sql=" + sql);
         try {
-            /* For ontop
+            // For ontop
             sql = sql.replaceAll("\"", "");
             sql = sql.replaceAll("AS TEXT", "as string");
             String pattern = "'(POLYGON\\(\\(.*\\)\\))'";
@@ -40,7 +40,6 @@ public class SparkStatement extends AbstractJdbcStatement {
             pattern = "'(POINT\\(.*\\))'";
             sql = sql.replaceAll(pattern, "ST_GeomFromWKT('$1')");
             LOGGER.log(Level.INFO, "SparkStatement: executeQuery() modified sql=" + sql);   
-            */
             resultSet = new SparkResultSet(connection.getConnectionInfo(), sql, sparkService);
             LOGGER.log(Level.INFO, "SparkStatement: resultSet count=" +  resultSet.getCount());     
             return resultSet;
