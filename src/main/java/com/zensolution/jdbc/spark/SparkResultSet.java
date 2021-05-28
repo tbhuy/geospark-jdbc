@@ -87,11 +87,13 @@ public class SparkResultSet extends AbstractJdbcResultSet {
         wasNullFlag = current.isNullAt(columnIndex - 1);
     }
 
+    
     @Override
     public String getString(int columnIndex) throws SQLException {
         checkOpen();
         checkNull(columnIndex);
-        return current.getString(columnIndex - 1);
+        return current.getAs(columnIndex - 1).toString();
+        //return current.getString(columnIndex - 1);
     }
 
     @Override
@@ -160,6 +162,11 @@ public class SparkResultSet extends AbstractJdbcResultSet {
             return s.getBytes(Charset.defaultCharset());
         }
         return null;
+    }
+
+    @Override
+    public int getFetchSize() throws SQLException {
+        return count;
     }
 
     @Override
@@ -303,8 +310,8 @@ public class SparkResultSet extends AbstractJdbcResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        //return this.resultSetMetaData;
-        return null;
+        return this.resultSetMetaData;
+        //return null;
     }
 
     @Override

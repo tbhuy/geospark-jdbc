@@ -38,11 +38,12 @@ public class SparkConnectionTest {
 //        });
     }
 
+    
     @Test
     public void testConnection() throws Exception {
         File root = new File(this.getClass().getClassLoader().getResource("samples/userdata1").toURI());
 
-        Connection conn = DriverManager.getConnection("jdbc:spark:local?path="+root.getParentFile().getAbsolutePath());
+        Connection conn = DriverManager.getConnection("jdbc:spark:local?config="+root.getAbsolutePath());
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery("select * from userdata1");
         Assertions.assertEquals(13, rs.getMetaData().getColumnCount());

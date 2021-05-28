@@ -53,6 +53,23 @@ public class SparkDatabaseMetaData extends AbstractJdbcDatabaseMetaData {
     }
 
     @Override
+    public ResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException {
+        //return new SparkResultSet(sparkService.createEmptyDataset());
+        return new SparkResultSet(sparkService.getPrimaryKeys(table));
+    }
+
+    @Override
+    public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate) throws SQLException {
+        return new SparkResultSet(sparkService.createEmptyDataset());
+    }
+
+    @Override
+    public ResultSet getImportedKeys(String catalog, String schema, String table) throws SQLException {
+        return new SparkResultSet(sparkService.createEmptyDataset());
+    }
+
+
+    @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
         return new SparkResultSet(sparkService.getTables());
     }

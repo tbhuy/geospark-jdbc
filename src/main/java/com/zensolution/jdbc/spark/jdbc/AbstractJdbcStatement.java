@@ -48,7 +48,7 @@ public abstract class AbstractJdbcStatement implements Statement  {
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
     }
 
     @Override

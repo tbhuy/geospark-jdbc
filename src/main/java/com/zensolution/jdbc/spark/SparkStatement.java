@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class SparkStatement extends AbstractJdbcStatement {
 
-    private static final Logger LOGGER = Logger.getLogger("com.nyiso.qa.emsbms.jdbc.spark.SparkDriver");
+    private static final Logger LOGGER = Logger.getLogger(SparkStatement.class.getName());
 
     private SparkConnection connection;
     private SparkService sparkService;
@@ -23,15 +23,26 @@ public class SparkStatement extends AbstractJdbcStatement {
     private SparkResultSet resultSet;
 
     protected SparkStatement(SparkConnection connection, SparkService sparkService) {
-        LOGGER.log(Level.FINE, "SparkDriver:connect() - connection=" + connection);
+        LOGGER.log(Level.INFO, "SparkStatement: connection=" + connection.getConnectionInfo());
         this.connection = connection;
         this.sparkService = sparkService;
     }
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
+        LOGGER.log(Level.INFO, "SparkStatement: executeQuery() sql=" + sql);
         try {
+            /* For ontop
+            sql = sql.replaceAll("\"", "");
+            sql = sql.replaceAll("AS TEXT", "as string");
+            String pattern = "'(POLYGON\\(\\(.*\\)\\))'";
+            sql = sql.replaceAll(pattern, "ST_GeomFromWKT('$1')");
+            pattern = "'(POINT\\(.*\\))'";
+            sql = sql.replaceAll(pattern, "ST_GeomFromWKT('$1')");
+            LOGGER.log(Level.INFO, "SparkStatement: executeQuery() modified sql=" + sql);   
+            */
             resultSet = new SparkResultSet(connection.getConnectionInfo(), sql, sparkService);
+            LOGGER.log(Level.INFO, "SparkStatement: resultSet count=" +  resultSet.getCount());     
             return resultSet;
         } catch (Exception e) {
             throw new SQLException(e);
@@ -56,6 +67,7 @@ public class SparkStatement extends AbstractJdbcStatement {
 
     @Override
     public boolean execute(String sql) throws SQLException {
+        LOGGER.log(Level.INFO, "GeoSparkDriver: execute() - sql={}", sql);
         try {
             resultSet = new SparkResultSet(connection.getConnectionInfo(), sql, sparkService);
         } catch (ParseException e) {

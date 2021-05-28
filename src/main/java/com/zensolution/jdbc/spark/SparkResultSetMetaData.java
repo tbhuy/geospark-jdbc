@@ -8,28 +8,41 @@ import org.apache.spark.sql.types.StructType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SparkResultSetMetaData extends AbstractJdbcResultSetMetaData {
 
     private List<StructField> structFields = new ArrayList<>();
+    private static final Logger LOGGER = Logger.getLogger(SparkResultSetMetaData.class.getName());
 
     public SparkResultSetMetaData(StructType structType) {
+        
         for (int i = 0; i < structType.fields().length; i++) {
             this.structFields.add(structType.fields()[i]);
+            LOGGER.log(Level.INFO, "GeoSparkDriver: Metadata [" + i + ": " + structType.fields()[i].name() + " (" +  structType.fields()[i].dataType().typeName()+")]");
+
         }
     }
-
+    
+   
     public int indexOf(String column) throws SQLException {
+         LOGGER.log(Level.INFO, "GeoSparkDriver: indexOf " + column);
+
+        //column = column.replaceAll("'NULLABLE' ", "");
+        //if (column.toLowerCase().contains("nullable"))
+        //    return 6;
         for (int i = 0; i < structFields.size(); i++ ) {
             if (structFields.get(i).name().equalsIgnoreCase(column)) {
                 return i+1;
             }
         }
-        throw new SQLException("Unknown column '" + column + "'");
+        throw new SQLException("GeoSpark driver: Unknown column '" + column + "'");
     }
 
     @Override
     public int getColumnCount() throws SQLException {
+        LOGGER.log(Level.INFO, "GeoSparkDriver: Count count={}",structFields.size());
         return structFields.size();
     }
 
@@ -75,12 +88,13 @@ public class SparkResultSetMetaData extends AbstractJdbcResultSetMetaData {
 
     @Override
     public String getColumnName(int column) throws SQLException {
+        LOGGER.log(Level.INFO, "GeoSparkDriver: getColumnName {}", this.structFields.get(column-1).name());
         return this.structFields.get(column-1).name();
     }
 
     @Override
     public String getSchemaName(int column) throws SQLException {
-        return "";
+        return "sparkschem";
     }
 
 
@@ -97,7 +111,7 @@ public class SparkResultSetMetaData extends AbstractJdbcResultSetMetaData {
 
     @Override
     public String getColumnTypeName(int column) throws SQLException {
-        return null;
+        return "";
     }
 
     @Override
@@ -125,7 +139,7 @@ public class SparkResultSetMetaData extends AbstractJdbcResultSetMetaData {
         if (iface.isAssignableFrom(getClass())) {
             return iface.cast(this);
         }
-        throw new SQLException("Cannot unwrap to " + iface.getName());
+        throw new SQLException("GeoSparkDriver: Cannot unwrap to " + iface.getName());
     }
 
     @Override
